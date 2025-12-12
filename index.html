@@ -1,1 +1,584 @@
-df
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bantu Linguistic Autoencoder 85259 - Ukubona Witnesses</title>
+    <style>
+        :root {
+            --bg-dark: #0a0a1a;
+            --bg-light: #1a1a2e;
+            --text-gold: #ffd700;
+            --text-blue: #4a9eff;
+            --text-sub: #9ab;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-light) 100%);
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden; /* Prevent scroll on mobile due to scaling */
+        }
+
+        /* --- HEADER SECTION (Reflows naturally now) --- */
+        header {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            padding: 40px 20px 20px;
+            z-index: 20;
+            position: relative;
+        }
+
+        .header-title {
+            font-size: clamp(20px, 4vw, 28px); /* Responsive font size */
+            font-weight: bold;
+            color: var(--text-gold);
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+        }
+
+        .header-subtitle a {
+            color: inherit;
+            text-decoration: none;
+            border-bottom: 1px dotted rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .header-subtitle a:hover {
+            color: var(--text-blue);
+            text-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
+            border-bottom-color: var(--text-blue);
+        }
+
+        /* The Architecture Label (8-5-2-5-9) */
+        .architecture-label {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-blue);
+            letter-spacing: 8px;
+            margin: 20px 0 10px;
+            display: inline-block;
+            background: rgba(10, 10, 26, 0.6);
+            padding: 5px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(74, 158, 255, 0.2);
+        }
+
+        /* --- NETWORK DIAGRAM WRAPPERS --- */
+        
+        /* The container that handles the scaling on mobile */
+        .scaling-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            overflow: visible;
+            margin-top: 20px;
+            padding-bottom: 50px;
+        }
+
+        /* The canvas that holds specific pixel coordinates */
+        .network-canvas {
+            position: relative;
+            width: 1000px; /* Fixed logical width */
+            height: 1000px; /* Fixed logical height */
+            /* This scale trick ensures it fits on mobile without breaking SVG coordinates */
+            transform-origin: top center; 
+        }
+
+        /* --- DIAGRAM ELEMENTS --- */
+
+        /* Sun */
+        .sun {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            z-index: 10;
+            animation: pulse 3s ease-in-out infinite;
+            cursor: default;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateX(-50%) scale(1); filter: drop-shadow(0 0 10px #ffd700); }
+            50% { transform: translateX(-50%) scale(1.2); filter: drop-shadow(0 0 25px #ffd700); }
+        }
+
+        /* Layers */
+        .layer {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px; /* Increased gap slightly */
+            width: 100%;
+            pointer-events: none; /* Let clicks pass through to neurons */
+        }
+
+        /* Neurons */
+        .neuron {
+            background: rgba(74, 158, 255, 0.05);
+            border: 2px solid;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            text-decoration: none;
+            padding: 10px;
+            backdrop-filter: blur(2px);
+            pointer-events: auto; /* Re-enable clicks */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .neuron:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 20px currentColor;
+            z-index: 100;
+        }
+
+        /* Specific Layer Positions (Logic: Top=Output, Bottom=Input) */
+        
+        /* Layer 5: USAGE (Top) */
+        .layer-5 { top: 120px; }
+        .layer-5 .neuron { width: 110px; height: 110px; border-color: #4a9eff; background: rgba(74, 158, 255, 0.15); }
+
+        /* Layer 4: CONJUGATIONS */
+        .layer-4 { top: 300px; }
+        .layer-4 .neuron { width: 130px; height: 130px; border-color: #67e8f9; background: rgba(103, 232, 249, 0.1); }
+
+        /* Layer 3: INFINITIVES (Bottleneck) */
+        .layer-3 { top: 480px; gap: 40px; }
+        .layer-3 .neuron { width: 150px; height: 150px; border-color: #ffd700; background: rgba(255, 215, 0, 0.1); box-shadow: 0 0 15px rgba(255, 215, 0, 0.1); }
+
+        /* Layer 2: ROOTS */
+        .layer-2 { top: 660px; }
+        .layer-2 .neuron { width: 130px; height: 130px; border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
+
+        /* Layer 1: LANGUAGES (Bottom) */
+        .layer-1 { top: 840px; }
+        .layer-1 .neuron { width: 110px; height: 110px; border-color: #8b4513; background: rgba(139, 69, 19, 0.15); }
+
+        /* Earth */
+        .earth {
+            position: absolute;
+            bottom: -20px; /* Adjusted to fit canvas */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+        }
+
+        /* Typography inside Neurons */
+        .layer-title { font-size: 11px; font-weight: bold; margin-bottom: 4px; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
+        .layer-name { font-size: 10px; margin-bottom: 2px; text-align: center; font-style: italic; color: #eee; }
+        .layer-role { font-size: 9px; opacity: 0.7; text-align: center; }
+
+        /* SVG Connections */
+        .connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .connections line {
+            stroke: rgba(255, 255, 255, 0.08);
+            stroke-width: 1.5;
+            transition: stroke 0.3s;
+        }
+
+        /* Labels (Encode/Decode) */
+        .side-label {
+            position: absolute;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-gold);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            letter-spacing: 4px;
+            opacity: 0.6;
+        }
+        .encoder-label { left: 10px; top: 680px; }
+        .decoder-label { right: 10px; top: 220px; }
+
+        /* --- UI CONTROLS --- */
+        .info-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 55px;
+            height: 55px;
+            background: rgba(10, 10, 26, 0.8);
+            border: 2px solid var(--text-gold);
+            border-radius: 50%;
+            color: var(--text-gold);
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ukb-note {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            max-width: 450px;
+            background: rgba(15, 15, 30, 0.98);
+            color: #fff;
+            border: 1px solid var(--text-blue);
+            padding: 25px;
+            border-radius: 16px;
+            z-index: 2000;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .ukb-note.visible { display: block; animation: fadeIn 0.3s ease; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -45%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+
+        .ukb-note h4 { margin: 0 0 15px; color: var(--text-gold); font-size: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .ukb-note button.action-btn { margin-top: 15px; padding: 10px 16px; border-radius: 8px; cursor: pointer; background: #0b3578; color: #fff; border: none; font-size: 13px; font-weight: bold; margin-right: 10px; }
+        .close-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; opacity: 0.7; }
+        
+        .ukb-highlight { 
+            box-shadow: 0 0 30px var(--text-gold), inset 0 0 20px var(--text-gold) !important; 
+            border-color: #fff !important;
+            transform: scale(1.1) !important;
+            z-index: 50 !important;
+        }
+
+        /* --- MEDIA QUERIES --- */
+        @media (max-width: 1024px) {
+            /* Handled by JS scaling, but basic tweaks here */
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">BANTU LINGUISTIC AUTOENCODER</div>
+        
+        <div class="header-subtitle">
+            Genesis 1:28 - "<a href="https://www.biblegateway.com/passage/?search=Olubereberye%201&version=LCB">Muzaale</a>.. mwale, mweyongere mujjuze ensi"
+        </div>
+        <div class="header-subtitle">
+            "Be fruitful, multiply, replenish the earth, subdue it"
+        </div>
+        <div class="header-subtitle">
+            <a href="https://www.youtube.com/watch?v=S7SsuvV8Zos">Ivyabona</a> vya Yehova - Witnesses who survived the collision
+        </div>
+
+        <div class="architecture-label">8-5-2-5-9</div>
+    </header>
+
+    <div class="scaling-wrapper">
+        <div class="network-canvas" id="networkCanvas">
+            
+            <svg class="connections">
+                <line x1="10%" y1="900" x2="25%" y2="730" />
+                <line x1="20%" y1="900" x2="33%" y2="730" />
+                <line x1="30%" y1="900" x2="41.5%" y2="730" />
+                <line x1="40%" y1="900" x2="50%" y2="730" />
+                <line x1="60%" y1="900" x2="58.5%" y2="730" />
+                <line x1="70%" y1="900" x2="67%" y2="730" />
+                <line x1="80%" y1="900" x2="75%" y2="730" />
+                <line x1="90%" y1="900" x2="75%" y2="730" />
+                
+                <line x1="25%" y1="660" x2="42%" y2="560" />
+                <line x1="33%" y1="660" x2="42%" y2="560" />
+                <line x1="41.5%" y1="660" x2="50%" y2="560" />
+                <line x1="58.5%" y1="660" x2="58%" y2="560" />
+                <line x1="67%" y1="660" x2="58%" y2="560" />
+                <line x1="75%" y1="660" x2="58%" y2="560" />
+                
+                <line x1="42%" y1="480" x2="25%" y2="380" />
+                <line x1="42%" y1="480" x2="33%" y2="380" />
+                <line x1="50%" y1="480" x2="41.5%" y2="380" />
+                <line x1="58%" y1="480" x2="58.5%" y2="380" />
+                <line x1="58%" y1="480" x2="67%" y2="380" />
+                <line x1="58%" y1="480" x2="75%" y2="380" />
+                
+                <line x1="25%" y1="300" x2="10%" y2="180" />
+                <line x1="33%" y1="300" x2="20%" y2="180" />
+                <line x1="41.5%" y1="300" x2="30%" y2="180" />
+                <line x1="50%" y1="300" x2="40%" y2="180" />
+                <line x1="58.5%" y1="300" x2="60%" y2="180" />
+                <line x1="67%" y1="300" x2="70%" y2="180" />
+                <line x1="75%" y1="300" x2="80%" y2="180" />
+                <line x1="75%" y1="300" x2="90%" y2="180" />
+                
+                <line x1="50%" y1="70" x2="50%" y2="120" stroke="rgba(255, 215, 0, 0.5)" stroke-width="2" />
+            </svg>
+
+            <div class="sun">☀️</div>
+
+            <div class="side-label encoder-label">ENCODE ↓</div>
+            <div class="side-label decoder-label">DECODE ↑</div>
+
+            <div class="layer layer-5">
+                <a href="https://ukb-dt.github.io/d/" class="neuron">
+                    <div class="layer-title" style="color: #4a9eff;">OKUZALA</div>
+                    <div class="layer-name" style="color: #67e8f9;">Birth</div>
+                    <div class="layer-role" style="color: #9ab;">Gen 1:28</div>
+                </a>
+                <a href="https://abikesa.github.io/zarathustra/" class="neuron">
+                    <div class="layer-title" style="color: #4a9eff;">MUZAALE</div>
+                    <div class="layer-name" style="color: #67e8f9;">Begetter</div>
+                    <div class="layer-role" style="color: #9ab;">Name</div>
+                </a>
+                <a href="https://ukb-dt.github.io/power-time/" class="neuron">
+                    <div class="layer-title" style="color: #4a9eff;">OKUMERA</div>
+                    <div class="layer-name" style="color: #67e8f9;">Sprout</div>
+                    <div class="layer-role" style="color: #9ab;">Root</div>
+                </a>
+                <a href="https://ukb-dt.github.io/dt/" class="neuron">
+                    <div class="layer-title" style="color: #4a9eff;">OKUKULA</div>
+                    <div class="layer-name" style="color: #67e8f9;">Mature</div>
+                    <div class="layer-role" style="color: #9ab;">Grow</div>
+                </a>
+                <a href="https://en.wikipedia.org/wiki/Schumann_resonances" class="neuron">
+                    <div class="layer-title" style="color: #4a9eff;">OKUKONA</div>
+                    <div class="layer-name" style="color: #67e8f9;">Collide</div>
+                    <div class="layer-role" style="color: #9ab;">Survive</div>
+                </a>
+                <a href="https://ukb-dt.github.io/dar/" class="neuron">
+                    <div class="layer-title" style="color: #4a9eff;">NGIKHONA</div>
+                    <div class="layer-name" style="color: #67e8f9;">I'm here!</div>
+                    <div class="layer-role" style="color: #9ab;">Still alive</div>
+                </a>
+                <a href="https://ukubona-llc.github.io/" class="neuron">
+                    <div class="layer-title" style="color: #4a9eff;">OKUBONA</div>
+                    <div class="layer-name" style="color: #67e8f9;">Witness</div>
+                    <div class="layer-role" style="color: #9ab;">See/Testify</div>
+                </a>
+                <a href="https://ukb-dt.github.io/wa/" class="neuron">
+                    <div class="layer-title" style="color: #4a9eff;">IVYABONA</div>
+                    <div class="layer-name" style="color: #67e8f9;">Witnesses</div>
+                    <div class="layer-role" style="color: #9ab;">Psalm 23</div>
+                </a>
+            </div>
+
+            <div class="layer layer-4">
+                <a href="https://ukb-dt.github.io/pipeline/" class="neuron">
+                    <div class="layer-title" style="color: #67e8f9;">-A</div>
+                    <div class="layer-name" style="color: #4a9eff;">Indicative</div>
+                    <div class="layer-role" style="color: #9ab;">General</div>
+                </a>
+                <a href="https://ukb-dt.github.io/d-dt/" class="neuron">
+                    <div class="layer-title" style="color: #67e8f9;">-E</div>
+                    <div class="layer-name" style="color: #4a9eff;">Subjunctive</div>
+                    <div class="layer-role" style="color: #9ab;">Command</div>
+                </a>
+                <a href="https://ukb-dt.github.io/svo/" class="neuron">
+                    <div class="layer-title" style="color: #67e8f9;">-NGA</div>
+                    <div class="layer-name" style="color: #4a9eff;">Progressive</div>
+                    <div class="layer-role" style="color: #9ab;">While</div>
+                </a>
+                <a href="https://ukb-dt.github.io/grit/" class="neuron">
+                    <div class="layer-title" style="color: #67e8f9;">-YE/-ILE</div>
+                    <div class="layer-name" style="color: #4a9eff;">Perfect</div>
+                    <div class="layer-role" style="color: #9ab;">Done</div>
+                </a>
+                <a href="https://ukb-dt.github.io/canon/" class="neuron">
+                    <div class="layer-title" style="color: #67e8f9;">-IRE</div>
+                    <div class="layer-name" style="color: #4a9eff;">Stative</div>
+                    <div class="layer-role" style="color: #9ab;">State</div>
+                </a>
+            </div>
+
+            <div class="layer layer-3">
+                <a href="https://ukb-dt.github.io/gan/" class="neuron">
+                    <div class="layer-title" style="color: #ffd700;">UKU-</div>
+                    <div class="layer-name" style="color: #ffed4e;">Infinitive</div>
+                    <div class="layer-role" style="color: #9ab;">isiZulu</div>
+                    <div class="layer-role" style="color: #9ab; margin-top: 2px;">Action</div>
+                </a>
+                <a href="https://ukb-dt.github.io/op/" class="neuron">
+                    <div class="layer-title" style="color: #ffd700;">OKU-</div>
+                    <div class="layer-name" style="color: #ffed4e;">Infinitive</div>
+                    <div class="layer-role" style="color: #9ab;">Luganda</div>
+                    <div class="layer-role" style="color: #9ab; margin-top: 2px;">Essence</div>
+                </a>
+            </div>
+
+            <div class="layer layer-2">
+                <a href="https://ukb-dt.github.io/amb/" class="neuron">
+                    <div class="layer-title" style="color: #ff6b6b;">-ZAL-</div>
+                    <div class="layer-name" style="color: #ff8787;">Birth</div>
+                    <div class="layer-role" style="color: #9ab;">Beget</div>
+                </a>
+                <a href="https://ukb-dt.github.io/openAI/" class="neuron">
+                    <div class="layer-title" style="color: #ff6b6b;">-MER-</div>
+                    <div class="layer-name" style="color: #ff8787;">Sprout</div>
+                    <div class="layer-role" style="color: #9ab;">Root</div>
+                </a>
+                <a href="https://ukb-dt.github.io/nyu/" class="neuron">
+                    <div class="layer-title" style="color: #ff6b6b;">-KUL-</div>
+                    <div class="layer-name" style="color: #ff8787;">Grow</div>
+                    <div class="layer-role" style="color: #9ab;">Mature</div>
+                </a>
+                <a href="https://ukb-dt.github.io/kon/" class="neuron">
+                    <div class="layer-title" style="color: #ff6b6b;">-KON-</div>
+                    <div class="layer-name" style="color: #ff8787;">Collide</div>
+                    <div class="layer-role" style="color: #9ab;">Persist</div>
+                </a>
+                <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8602571/" class="neuron">
+                    <div class="layer-title" style="color: #ff6b6b;">-BON-</div>
+                    <div class="layer-name" style="color: #ff8787;">See</div>
+                    <div class="layer-role" style="color: #9ab;">Witness</div>
+                </a>
+            </div>
+
+            <div class="layer layer-1">
+                <a href="https://ukb-dt.github.io/ai-tree/" class="neuron">
+                    <div class="layer-title" style="color: #d2691e;">LUGANDA</div>
+                    <div class="layer-name" style="color: #cd853f;">Uganda</div>
+                    <div class="layer-role" style="color: #9ab;">Baganda</div>
+                </a>
+                <a href="https://ukb-dt.github.io/ftp/" class="neuron">
+                    <div class="layer-title" style="color: #d2691e;">RWANDA</div>
+                    <div class="layer-name" style="color: #cd853f;">Rwanda</div>
+                    <div class="layer-role" style="color: #9ab;">Banyarwanda</div>
+                </a>
+                <a href="https://www.youtube.com/watch?v=S7SsuvV8Zos" class="neuron">
+                    <div class="layer-title" style="color: #d2691e;">KIRUNDI</div>
+                    <div class="layer-name" style="color: #cd853f;">Burundi</div>
+                    <div class="layer-role" style="color: #9ab;">Barundi</div>
+                </a>
+                <a href="https://ukb-dt.github.io/mureebe-muzaale/" class="neuron">
+                    <div class="layer-title" style="color: #d2691e;">NYANKORE</div>
+                    <div class="layer-name" style="color: #cd853f;">Uganda</div>
+                    <div class="layer-role" style="color: #9ab;">Banyankore</div>
+                </a>
+                <a href="https://ukb-dt.github.io/eac/" class="neuron">
+                    <div class="layer-title" style="color: #d2691e;">SWAHILI</div>
+                    <div class="layer-name" style="color: #cd853f;">E. Africa</div>
+                    <div class="layer-role" style="color: #9ab;">Waswahili</div>
+                </a>
+                <a href="https://ukb-dt.github.io/ntu-wa/" class="neuron">
+                    <div class="layer-title" style="color: #d2691e;">ISIZULU</div>
+                    <div class="layer-name" style="color: #cd853f;">S. Africa</div>
+                    <div class="layer-role" style="color: #9ab;">AmaZulu</div>
+                </a>
+                <a href="https://stias.ac.za/fellows/projects/ukuhamba-kukubona-to-travel-is-to-see-a-feminist-exploration-of-the-intellectual-legacies-of-black-womens-mobilities/" class="neuron">
+                    <div class="layer-title" style="color: #d2691e;">ISIXHOSA</div>
+                    <div class="layer-name" style="color: #cd853f;">S. Africa</div>
+                    <div class="layer-role" style="color: #9ab;">AmaXhosa</div>
+                </a>
+                <a href="https://ukb-dt.github.io/umu/" class="neuron">
+                    <div class="layer-title" style="color: #d2691e;">CHISHONA</div>
+                    <div class="layer-name" style="color: #cd853f;">Zimbabwe</div>
+                    <div class="layer-role" style="color: #9ab;">VaShona</div>
+                </a>
+            </div>
+
+            <div class="earth">🌍</div>
+        </div>
+    </div>
+
+    <button class="info-btn" onclick="toggleUkbNote()" title="About the 'wa' residual">💡</button>
+
+    <div class="ukb-note" id="ukbNote">
+        <button class="close-btn" onclick="toggleUkbNote()">×</button>
+        <h4>Ukubona note — where <code>wa</code> came from</h4>
+        <div id="ukbText">
+            1. You mapped surface tokens → roots → infinitives → conjugations (encode).<br><br>
+            2. After successful decode, the remaining role-marker (source/possessive) clustered in outputs: that is <code>wa</code> — a relational residual. <br><br>
+            3. In this viz, it appears when you highlight Layer-5 usages (decode). Use the buttons below to step the demonstration.
+        </div>
+        <div style="display:flex; gap:8px; margin-top:12px; flex-wrap: wrap;">
+            <button class="action-btn" onclick="ukbStep('highlight')">Highlight usage</button>
+            <button class="action-btn" onclick="ukbStep('showflow')">Show flow</button>
+        </div>
+    </div>
+
+    <script>
+        // --- RESIZING LOGIC ---
+        // This keeps the diagram perfectly proportional on any screen
+        function resizeCanvas() {
+            const wrapper = document.querySelector('.scaling-wrapper');
+            const canvas = document.querySelector('#networkCanvas');
+            const wrapperWidth = wrapper.offsetWidth;
+            const canvasWidth = 1000; // The fixed logic width we designed around
+            
+            // Only scale down, never up past 1.0 (unless you want it huge on 4k screens)
+            let scale = wrapperWidth / canvasWidth;
+            if (scale > 1) scale = 1;
+
+            // Apply scale
+            canvas.style.transform = `scale(${scale})`;
+            
+            // Adjust the wrapper height so the scaled canvas doesn't leave huge whitespace below
+            wrapper.style.height = `${1000 * scale}px`;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('DOMContentLoaded', resizeCanvas);
+
+        // --- INTERACTION LOGIC ---
+        function toggleUkbNote() {
+            const note = document.getElementById('ukbNote');
+            note.classList.toggle('visible');
+        }
+
+        function ukbStep(action) {
+            const layer5 = document.querySelectorAll('.layer-5 .neuron');
+            document.querySelectorAll('.neuron').forEach(n => n.classList.remove('ukb-highlight'));
+            
+            if (action === 'highlight') {
+                layer5.forEach(n => n.classList.add('ukb-highlight'));
+                document.getElementById('ukbText').innerHTML = '<b>Highlight:</b> Layer-5 usage nodes lit. <br><br>Observe relational tokens (source/possessive) cluster in decoded outputs — that\'s where <code>wa</code> is visible.';
+            } else if (action === 'showflow') {
+                const seq = [
+                    ...document.querySelectorAll('.layer-1 .neuron'),
+                    ...document.querySelectorAll('.layer-2 .neuron'),
+                    ...document.querySelectorAll('.layer-3 .neuron'),
+                    ...document.querySelectorAll('.layer-4 .neuron'),
+                    ...document.querySelectorAll('.layer-5 .neuron')
+                ];
+                let i = 0;
+                const t = setInterval(() => {
+                    document.querySelectorAll('.neuron').forEach(n => n.classList.remove('ukb-highlight'));
+                    if (i < seq.length) seq[i].classList.add('ukb-highlight');
+                    
+                    if (i === seq.length) {
+                        clearInterval(t);
+                        setTimeout(() => {
+                            document.querySelectorAll('.neuron').forEach(n => n.classList.remove('ukb-highlight'));
+                        }, 400);
+                    }
+                    i++;
+                }, 160);
+                document.getElementById('ukbText').innerHTML = '<b>Flow:</b> encoding (languages→roots→infinitives) then decoding (conjugations→usage). Relational residues appear on decode.';
+            }
+        }
+    </script>
+    
+</body>
+</html>
